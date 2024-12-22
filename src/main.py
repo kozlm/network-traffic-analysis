@@ -5,12 +5,11 @@ import click
 from nfstream import NFStreamer
 from yaml import load, CLoader
 from os import walk
-from os.path import join, isfile
+from os.path import join
 
-from graphs import normal_graphs, live_graphs
+from graphs import live_graphs
 from machine_learning_model import train_model, test_model, create_and_train_model, read_model, select_fields
 from rules import high_packets, port_80, large_data
-from src.machine_learning_model import plot_feature_importance
 from src.report import generate_pcap_analysis_report
 
 protocols = {

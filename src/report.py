@@ -9,7 +9,7 @@ def generate_testing_report(y,predicted, report_file="../reports/model_report.pd
     cm = confusion_matrix(y, predicted, labels=['malicious', 'normal'])
     tn, fp, fn, tp = cm.ravel()
 
-    # Metrics
+    # metrics
     fpr = fp / (fp + tn) if (fp + tn) > 0 else 0
     tpr = tp / (tp + fn) if (tp + fn) > 0 else 0
     accuracy = accuracy_score(y, predicted)
@@ -18,31 +18,29 @@ def generate_testing_report(y,predicted, report_file="../reports/model_report.pd
 
     plot_confusion_matrix(cm, labels=['malicious', 'normal'], filename=matrix_plot_filename)
 
-    # Generate PDF
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
-    # Add title
+    # title
     pdf.set_font("Arial", style="B", size=16)
     pdf.cell(200, 10, txt="Model Evaluation Report", ln=True, align='C')
     pdf.ln(10)
 
-    # Add metrics
+    # metrics
     pdf.set_font("Arial", size=12)
     pdf.cell(0, 10, txt=f"True Positive Rate (TPR): {tpr:.2f}", ln=True)
     pdf.cell(0, 10, txt=f"False Positive Rate (FPR): {fpr:.2f}", ln=True)
     pdf.cell(0, 10, txt=f"Accuracy: {accuracy:.2f}", ln=True)
     pdf.ln(10)
 
-    # Add confusion matrix plot
+    # confusion matrix plot
     pdf.set_font("Arial", size=12)
     pdf.cell(0, 10, txt="Confusion Matrix:", ln=True)
     pdf.ln(5)
     pdf.image(matrix_plot_filename, x=10, y=None, w=180)  # Insert the image into the PDF
 
-    # Save the PDF
     pdf.output(report_file)
     print(f"Report saved as {report_file}")
     return accuracy
@@ -54,12 +52,12 @@ def generate_pcap_analysis_report(result, report_file="../reports/pcap_analysis_
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
 
-    # Add title
+    # title
     pdf.set_font("Arial", style="B", size=16)
     pdf.cell(200, 10, txt="PCAP Analysis Report", ln=True, align='C')
     pdf.ln(10)
 
-    # Add textual information
+    # info
     pdf.set_font("Arial", size=12)
     pdf.cell(0, 10, txt="Flow Analysis:", ln=True)
     pdf.set_font("Courier", size=10)
@@ -80,6 +78,7 @@ def generate_pcap_analysis_report(result, report_file="../reports/pcap_analysis_
         pdf.multi_cell(0, 10, txt=json.dumps(result['ml_analysis'], indent=4))
         pdf.ln(5)
 
+    # plots
     pdf.set_font("Arial", size=12)
     pdf.cell(0, 10, txt="Graphs:", ln=True)
     pdf.ln(5)
@@ -90,6 +89,5 @@ def generate_pcap_analysis_report(result, report_file="../reports/pcap_analysis_
         pdf.ln(10)
         pdf.image("../plots/ml_analysis.png", x=10, y=None, w=180)
 
-    # Save the PDF
     pdf.output(report_file)
     print(f"Report saved as {report_file}")

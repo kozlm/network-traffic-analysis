@@ -1,10 +1,10 @@
 import pickle
 
-import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
 from nfstream import NFStreamer
 from sklearn.linear_model import SGDClassifier
+
+from src.graphs import plot_feature_importance
 from src.report import generate_testing_report
 
 fields = [
@@ -47,18 +47,6 @@ def get_merged_dataset(malicious_pcap, normal_pcap):
     y = testing_data['class_label']
     return x, y
 
-def plot_feature_importance(model):
-    importance = np.abs(model.coef_[0])  # Get absolute values of the weights
-    feature_importance = pd.Series(importance, index=fields).sort_values(ascending=False)
-
-    # Plot feature importance
-    feature_importance.plot(kind='bar', figsize=(8, 6), color='teal')
-    plt.title("Feature Importance")
-    plt.xlabel("Features")
-    plt.ylabel("Absolute Weight")
-    plt.tight_layout()
-    plt.show()
-
 def select_fields(flow):
     return pd.DataFrame({f: [getattr(flow, f)] for f in fields})
 
@@ -68,6 +56,7 @@ def create_dataframe(pcap_file):
     return df[fields]
 
 def save_model(model):
+    plot_feature_importance(model)
     with open("model.pkl", "wb") as file:
         pickle.dump(model, file)
 

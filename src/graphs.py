@@ -1,6 +1,16 @@
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from sklearn.metrics import ConfusionMatrixDisplay
 
+fields = [
+    'src_port',
+    'dst_port',
+    'protocol',
+    'bidirectional_packets',
+    'bidirectional_bytes',
+    'bidirectional_duration_ms'
+]
 
 def normal_graphs(result):
     # bytes pie plot
@@ -26,8 +36,8 @@ def normal_graphs(result):
     v = [i[1] for i in items]
     plt.bar(c, v)
     plt.title("Rule Analysis")
-    plt.xticks(rotation=45, ha='right')  # Avoid cutting labels
-    plt.savefig("../plots/rule_analysis.png")  # Save as an image
+    plt.xticks(rotation=45, ha='right')
+    plt.savefig("../plots/rule_analysis.png")
     plt.close()
 
     if 'ml_analysis' not in result:
@@ -39,7 +49,7 @@ def normal_graphs(result):
     v = [i[1] for i in items]
     plt.pie(v, labels=c)
     plt.title("ML Analysis")
-    plt.savefig("../plots/ml_analysis.png")  # Save as an image
+    plt.savefig("../plots/ml_analysis.png")
     plt.close()
 
 
@@ -68,4 +78,17 @@ def plot_confusion_matrix(cm, labels, filename="../plots/confusion_matrix.png"):
     disp.plot(cmap="Blues", values_format="d")
     plt.title("Confusion Matrix")
     plt.savefig(filename, bbox_inches="tight")
+    plt.close()
+
+def plot_feature_importance(model):
+    importance = np.abs(model.coef_[0])  # Get absolute values of the weights
+    feature_importance = pd.Series(importance, index=fields).sort_values(ascending=False)
+
+    feature_importance.plot(kind='bar', figsize=(8, 6), color='teal')
+    plt.title("Feature Importance")
+    plt.xlabel("Features")
+    plt.ylabel("Absolute Weight")
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.savefig("../plots/feature_importance.png", bbox_inches="tight")
     plt.close()
