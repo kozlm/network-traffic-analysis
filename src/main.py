@@ -10,7 +10,8 @@ from os.path import join, isfile
 from graphs import normal_graphs, live_graphs
 from machine_learning_model import train_model, test_model, create_and_train_model, read_model, select_fields
 from rules import high_packets, port_80, large_data
-
+from src.machine_learning_model import plot_feature_importance
+from src.report import generate_pcap_analysis_report
 
 protocols = {
     1: 'ICMP',
@@ -41,11 +42,7 @@ def analyze_pcap(rules):
     use_ml = click.confirm("ML analysis?")
     model = read_model() if use_ml else None
     click.echo(f"Analysing file: {file_name}, ML analysis: {'Yes' if use_ml else 'No'}")
-    try:
-        streamer = NFStreamer(source=file_name)
-    except:
-        print('Błąd podczas ładowania pliku')
-        return
+    streamer = NFStreamer(source=file_name)
     src_dst_stats = {}
     rule_counts = [0 for _ in rules]
     e_counts = {'malicious': 0, 'normal': 0}
@@ -77,7 +74,7 @@ def analyze_pcap(rules):
         result = {
             'flow_analysis': flow_analysis,
             'rule_analysis': rule_analysis,
-            'ml_analysis': e_counts
+            use_ml and 'ml_analysis': e_counts
         }
     else:
         result = {
@@ -85,7 +82,7 @@ def analyze_pcap(rules):
             'rule_analysis': rule_analysis
         }
     print(json.dumps(result, indent=4))
-    normal_graphs(result)
+    generate_pcap_analysis_report(result)
 
 
 
@@ -97,7 +94,7 @@ def listen_on_interface(rules):
     try:
         streamer = NFStreamer(source=interface_name, idle_timeout=5, active_timeout=40, promiscuous_mode=True)
     except:
-        print('Błąd podczas nasłuchiwaniu na interfejsie')
+        print('Error occured while listening on the interface')
         return
     start = time.time_ns()
     breaks = {r.__name__: {0: 0} for r in rules}
@@ -106,7 +103,6 @@ def listen_on_interface(rules):
     n = 0
     try:
         for flow in streamer:
-            print(flow.bidirectional_duration_ms)
             n += 1
             current = time.time_ns()
             for i, r in enumerate(rules):
@@ -114,7 +110,7 @@ def listen_on_interface(rules):
                     minute = (current - start) / (60 * (10 ** 9))
                     rule_counts[r.__name__] += 1
                     breaks[r.__name__][minute] = rule_counts[r.__name__]
-                    print(f'Złamana zasada: {r.__name__}')
+                    print(f'ALERT: broken rule - {r.__name__}')
             if use_ml:
                 e_counts[model.predict(select_fields(flow))[0]] += 1
     except KeyboardInterrupt as e:
@@ -187,7 +183,7 @@ def main_menu():
             click.echo("Wrong input, try again.")
 
 
+
+
 if __name__ == "__main__":
-    # main_menu()
-    with open('tmp.json', 'r') as f:
-        live_graphs(json.loads(f.read()))
+    main_menu()

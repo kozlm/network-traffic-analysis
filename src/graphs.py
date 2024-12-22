@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
+from sklearn.metrics import ConfusionMatrixDisplay
 
 
 def normal_graphs(result):
+    # bytes pie plot
     data = [(int(d['total_bytes']), f'{d["source_ip"]} ->\n{d["destination_ip"]}') for d in result['flow_analysis']]
     s = sum(x[0] for x in data)
     limit = s // 100
@@ -13,20 +15,32 @@ def normal_graphs(result):
     l.append('other')
     plt.figure(figsize=(7, 7))
     plt.pie(x, labels=l, autopct=lambda a: f'{int(round(a * s))}B')
-    plt.show()
+    plt.title("Flow Analysis")
+    plt.savefig("../plots/flow_analysis.png")
+    plt.close()
+
+    # rule bar plot
     plt.figure(figsize=(7, 7))
     items = list(i for i in result['rule_analysis'].items())
     c = [i[0] for i in items]
     v = [i[1] for i in items]
     plt.bar(c, v)
-    plt.show()
+    plt.title("Rule Analysis")
+    plt.xticks(rotation=45, ha='right')  # Avoid cutting labels
+    plt.savefig("../plots/rule_analysis.png")  # Save as an image
+    plt.close()
+
     if 'ml_analysis' not in result:
         return
+
+    # ml plot
     items = list(i for i in result['ml_analysis'].items())
     c = [i[0] for i in items]
     v = [i[1] for i in items]
     plt.pie(v, labels=c)
-    plt.show()
+    plt.title("ML Analysis")
+    plt.savefig("../plots/ml_analysis.png")  # Save as an image
+    plt.close()
 
 
 def live_graphs(result):
@@ -47,3 +61,11 @@ def live_graphs(result):
     v = [i[1] for i in items]
     plt.pie(v, labels=c)
     plt.show()
+
+
+def plot_confusion_matrix(cm, labels, filename="../plots/confusion_matrix.png"):
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
+    disp.plot(cmap="Blues", values_format="d")
+    plt.title("Confusion Matrix")
+    plt.savefig(filename, bbox_inches="tight")
+    plt.close()

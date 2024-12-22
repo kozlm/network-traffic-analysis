@@ -1,10 +1,11 @@
 import pickle
 
+import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 from nfstream import NFStreamer
 from sklearn.linear_model import SGDClassifier
-from sklearn.metrics import confusion_matrix
-
+from src.report import generate_testing_report
 
 fields = [
     'src_port',
@@ -17,9 +18,10 @@ fields = [
 
 
 def create_and_train_model(malicious_pcap, normal_pcap):
-    model = SGDClassifier()
+    model = SGDClassifier(alpha=0.01, max_iter=1000, random_state=42)
     x,y = get_merged_dataset(malicious_pcap, normal_pcap)
     model.fit(x, y)
+    plot_feature_importance(model)
     save_model(model)
 
 
@@ -33,9 +35,7 @@ def test_model(malicious_pcap, normal_pcap):
     model = read_model()
     x,y = get_merged_dataset(malicious_pcap, normal_pcap)
     predicted = model.predict(x)
-    return confusion_matrix(predicted, y)
-    # tn, fp, fn, tp = confusion_matrix(actual, predicted).ravel()
-    # return {"TP": tp, "TN": tn, "FP": fp, "FN": fn}
+    return generate_testing_report(y,predicted)
 
 def get_merged_dataset(malicious_pcap, normal_pcap):
     malicious_data = create_dataframe(malicious_pcap)
@@ -46,6 +46,18 @@ def get_merged_dataset(malicious_pcap, normal_pcap):
     x = testing_data.drop(columns=['class_label'])
     y = testing_data['class_label']
     return x, y
+
+def plot_feature_importance(model):
+    importance = np.abs(model.coef_[0])  # Get absolute values of the weights
+    feature_importance = pd.Series(importance, index=fields).sort_values(ascending=False)
+
+    # Plot feature importance
+    feature_importance.plot(kind='bar', figsize=(8, 6), color='teal')
+    plt.title("Feature Importance")
+    plt.xlabel("Features")
+    plt.ylabel("Absolute Weight")
+    plt.tight_layout()
+    plt.show()
 
 def select_fields(flow):
     return pd.DataFrame({f: [getattr(flow, f)] for f in fields})
