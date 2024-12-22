@@ -6,6 +6,16 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import confusion_matrix
 
 
+fields = [
+    'src_port',
+    'dst_port',
+    'protocol',
+    'bidirectional_packets',
+    'bidirectional_bytes',
+    'bidirectional_duration_ms'
+]
+
+
 def create_and_train_model(malicious_pcap, normal_pcap):
     model = SGDClassifier()
     x,y = get_merged_dataset(malicious_pcap, normal_pcap)
@@ -37,18 +47,12 @@ def get_merged_dataset(malicious_pcap, normal_pcap):
     y = testing_data['class_label']
     return x, y
 
+def select_fields(flow):
+    return pd.DataFrame({f: [getattr(flow, f)] for f in fields})
+
 def create_dataframe(pcap_file):
     nfstreamer = NFStreamer(source=pcap_file)
     df = nfstreamer.to_pandas()
-
-    fields = [
-            'src_port',
-            'dst_port',
-            'protocol',
-            'bidirectional_packets',
-            'bidirectional_bytes',
-            'bidirectional_duration_ms'
-    ]
     return df[fields]
 
 def save_model(model):

@@ -1,0 +1,22 @@
+title: Cleartext Protocol Usage
+id: e2b2fa0f-934f-46db-81df-a4505e5f05f5
+status: stable
+references:
+  - https://www.example.com
+author: John Doe
+date: 2024-12-22
+modified: 2024-12-22
+logsource:
+  category: firewall
+detection:
+  selection:
+    dst_port:
+      - 8080
+      - 80
+      - 23
+      - 50000
+      - 1521
+  condition: selection
+falsepositives:
+  - Tests
+level: medium
