@@ -4,8 +4,8 @@ import pandas as pd
 from nfstream import NFStreamer
 from sklearn.linear_model import SGDClassifier
 
-from src.graphs import plot_feature_importance
-from src.report import generate_testing_report
+from graphs import plot_feature_importance
+from report import generate_testing_report
 
 fields = [
     'src_port',

@@ -10,7 +10,7 @@ from os.path import join
 from graphs import live_graphs
 from machine_learning_model import train_model, test_model, create_and_train_model, read_model, select_fields
 from rules import high_packets, port_80, large_data
-from src.report import generate_pcap_analysis_report
+from report import generate_pcap_analysis_report, generate_live_report
 
 protocols = {
     1: 'ICMP',
@@ -80,7 +80,9 @@ def analyze_pcap(rules):
             'flow_analysis': flow_analysis,
             'rule_analysis': rule_analysis
         }
-    print(json.dumps(result, indent=4))
+    j = json.dumps(result, indent=4)
+    with open('../reports/raw.json', 'w') as f:
+        f.write(j)
     generate_pcap_analysis_report(result)
 
 
@@ -124,10 +126,10 @@ def listen_on_interface(rules):
             result = {
                 'rule_breaks': breaks
             }
-        print(a := json.dumps(result, indent=4))
-        with open('tmp.json', 'w') as f:
-            f.write(a)
-        live_graphs(result)
+        j = json.dumps(result, indent=4)
+        with open('../reports/raw.json', 'w') as f:
+            f.write(j)
+        generate_live_report(result)
 
 
 def create_new_model():

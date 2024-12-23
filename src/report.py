@@ -2,7 +2,8 @@ from fpdf import FPDF
 import json
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-from src.graphs import plot_confusion_matrix, normal_graphs
+from graphs import plot_confusion_matrix, normal_graphs, live_graphs
+from maps import create_map
 
 
 def generate_testing_report(y,predicted, report_file="../reports/model_report.pdf"):
@@ -40,7 +41,6 @@ def generate_testing_report(y,predicted, report_file="../reports/model_report.pd
     pdf.cell(0, 10, txt="Confusion Matrix:", ln=True)
     pdf.ln(5)
     pdf.image(matrix_plot_filename, x=10, y=None, w=180)  # Insert the image into the PDF
-
     pdf.output(report_file)
     print(f"Report saved as {report_file}")
     return accuracy
@@ -88,6 +88,52 @@ def generate_pcap_analysis_report(result, report_file="../reports/pcap_analysis_
     if 'ml_analysis' in result:
         pdf.ln(10)
         pdf.image("../plots/ml_analysis.png", x=10, y=None, w=180)
+    pdf.ln(10)
+    ips = {x['source_ip'] for x in result['flow_analysis']}
+    ips |= {x['destination_ip'] for x in result['flow_analysis']}
+    j = create_map(ips)
+    pdf.image("../plots/map.png", x=10, y=None, w=180)
+    pdf.ln(10)
+    pdf.set_font("Courier", size=10)
+    pdf.multi_cell(0, 10, txt=json.dumps(j, indent=4))
+    pdf.output(report_file)
+    print(f"Report saved as {report_file}")
+
+
+def generate_live_report(result, report_file="../reports/live_analysis_report.pdf"):
+    live_graphs(result)
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+
+    # title
+    pdf.set_font("Arial", style="B", size=16)
+    pdf.cell(200, 10, txt="Live Analysis Report", ln=True, align='C')
+    pdf.ln(10)
+
+    # info
+    pdf.set_font("Arial", size=12)
+    pdf.cell(0, 10, txt="Rule Analysis", ln=True)
+    pdf.set_font("Courier", size=10)
+    pdf.multi_cell(0, 10, txt=json.dumps(result['rule_breaks'], indent=4))
+    pdf.ln(5)
+
+    if 'ml_analysis' in result:
+        pdf.set_font("Arial", size=12)
+        pdf.cell(0, 10, txt="ML Analysis:", ln=True)
+        pdf.set_font("Courier", size=10)
+        pdf.multi_cell(0, 10, txt=json.dumps(result['ml_analysis'], indent=4))
+        pdf.ln(5)
+
+    # plots
+    pdf.set_font("Arial", size=12)
+    pdf.cell(0, 10, txt="Graphs:", ln=True)
+    pdf.ln(5)
+    pdf.image("../plots/rule_analysis.png", x=10, y=None, w=180)
+    if 'ml_analysis' in result:
+        pdf.ln(10)
+        pdf.image("../plots/ml_analysis.png", x=10, y=None, w=180)
+    pdf.ln(10)
 
     pdf.output(report_file)
     print(f"Report saved as {report_file}")

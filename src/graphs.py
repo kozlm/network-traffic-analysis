@@ -63,14 +63,17 @@ def live_graphs(result):
     plt.xlabel('Czas (min)')
     plt.ylabel('Wystąpienia')
     plt.legend()
-    plt.show()
+    plt.savefig("../plots/rule_analysis.png")
+    plt.close()
     if 'ml_analysis' not in result:
         return
     items = list(i for i in result['ml_analysis'].items())
     c = [i[0] for i in items]
     v = [i[1] for i in items]
     plt.pie(v, labels=c)
-    plt.show()
+    plt.title("ML Analysis")
+    plt.savefig("../plots/ml_analysis.png")
+    plt.close()
 
 
 def plot_confusion_matrix(cm, labels, filename="../plots/confusion_matrix.png"):
