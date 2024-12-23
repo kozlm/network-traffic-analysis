@@ -7,7 +7,6 @@ from yaml import load, CLoader
 from os import walk
 from os.path import join
 
-from graphs import live_graphs
 from machine_learning_model import train_model, test_model, create_and_train_model, read_model, select_fields
 from rules import high_packets, port_80, large_data
 from report import generate_pcap_analysis_report, generate_live_report
