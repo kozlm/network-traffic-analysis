@@ -1,0 +1,48 @@
+{
+    "flow_analysis": [
+        {
+            "flow_count": 202,
+            "source_ip": "fe80::da58:d7ff:fe00:f72",
+            "destination_ip": "fe80::5860:41c8:b74d:ba93",
+            "total_bytes": 165821,
+            "protocols": [
+                "UDP",
+                "ICMPv6"
+            ],
+            "broken_rules": [
+                "high_packets",
+                "large_data"
+            ]
+        },
+        {
+            "flow_count": 6,
+            "source_ip": "192.168.1.167",
+            "destination_ip": "192.168.1.127",
+            "total_bytes": 1256,
+            "protocols": [
+                "TCP"
+            ],
+            "broken_rules": []
+        },
+        {
+            "flow_count": 2,
+            "source_ip": "192.168.1.127",
+            "destination_ip": "8.8.8.8",
+            "total_bytes": 348,
+            "protocols": [
+                "UDP"
+            ],
+            "broken_rules": []
+        }
+    ],
+    "rule_analysis": {
+        "Cleartext Protocol Usage": 0,
+        "high_packets": 7,
+        "port_80": 0,
+        "large_data": 98
+    },
+    "ml_analysis": {
+        "malicious": 117,
+        "normal": 93
+    }
+}

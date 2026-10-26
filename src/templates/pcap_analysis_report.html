@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCAP Analysis Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+            padding: 32px;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #0f172a;
+            margin-top: 0;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 16px;
+        }
+        h2 {
+            color: #1e293b;
+            margin-top: 32px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 10px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+        pre {
+            background-color: #f1f5f9;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 13px;
+        }
+        .chart {
+            text-align: center;
+            margin: 24px 0;
+        }
+        .chart img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PCAP Analysis Report</h1>
+
+        <h2>Flow Analysis:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Source IP</th>
+                    <th>Destination IP</th>
+                    <th>Flow Count</th>
+                    <th>Total Bytes</th>
+                    <th>Protocols</th>
+                    <th>Broken Rules</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flow in flows %}
+                <tr>
+                    <td>{{ flow.source_ip }}</td>
+                    <td>{{ flow.destination_ip }}</td>
+                    <td>{{ flow.flow_count }}</td>
+                    <td>{{ flow.total_bytes }}</td>
+                    <td>{{ flow.protocols | join(", ") }}</td>
+                    <td>{{ flow.broken_rules | join(", ") }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% for item in flow_json_items %}
+        <pre>{{ item }}</pre>
+        {% endfor %}
+
+        <h2>Rule Analysis:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rule</th>
+                    <th>Triggered Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rule_name, count in rule_analysis.items() %}
+                <tr>
+                    <td>{{ rule_name }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <pre>{{ rule_analysis_json }}</pre>
+
+        {% if ml_analysis %}
+        <h2>ML Analysis:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Classification</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for label, count in ml_analysis.items() %}
+                <tr>
+                    <td>{{ label }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <pre>{{ ml_analysis_json }}</pre>
+        {% endif %}
+
+        <h2>Graphs:</h2>
+        {% if flow_plot %}
+        <div class="chart">
+            <img src="{{ flow_plot }}" alt="Flow Analysis">
+        </div>
+        {% endif %}
+
+        {% if rule_plot %}
+        <div class="chart">
+            <img src="{{ rule_plot }}" alt="Rule Analysis">
+        </div>
+        {% endif %}
+
+        {% if ml_plot %}
+        <div class="chart">
+            <img src="{{ ml_plot }}" alt="ML Analysis">
+        </div>
+        {% endif %}
+
+        <h2>Geolocation Map:</h2>
+        {% if map_image %}
+        <div class="chart">
+            <img src="{{ map_image }}" alt="IP Geolocation Map">
+        </div>
+        {% endif %}
+        {% if map_locations %}
+        <table>
+            <thead>
+                <tr>
+                    <th>IP Address</th>
+                    <th>City</th>
+                    <th>Country</th>
+                    <th>Coordinates</th>
+                    <th>Map Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ip, info in map_locations.items() %}
+                <tr>
+                    <td>{{ ip }}</td>
+                    <td>{{ info.city }}</td>
+                    <td>{{ info.country }}</td>
+                    <td>{{ info.lat }}, {{ info.lon }}</td>
+                    <td><a href="https://www.openstreetmap.org/?mlat={{ info.lat }}&mlon={{ info.lon }}#map=6/{{ info.lat }}/{{ info.lon }}" target="_blank" rel="noopener noreferrer">Open Map</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        <pre>{{ map_locations_json }}</pre>
+    </div>
+</body>
+</html>
+

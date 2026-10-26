@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Evaluation Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+            padding: 32px;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #0f172a;
+            margin-top: 0;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 16px;
+        }
+        h2 {
+            color: #1e293b;
+            margin-top: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        .metrics {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0;
+            font-size: 16px;
+        }
+        .metrics li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .chart {
+            text-align: center;
+            margin: 24px 0;
+        }
+        .chart img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Model Evaluation Report</h1>
+
+        <ul class="metrics">
+            <li>True Positive Rate (TPR): {{ tpr }}</li>
+            <li>False Positive Rate (FPR): {{ fpr }}</li>
+            <li>Accuracy: {{ accuracy }}</li>
+        </ul>
+
+        <h2>Confusion Matrix:</h2>
+        {% if confusion_matrix_image %}
+        <div class="chart">
+            <img src="{{ confusion_matrix_image }}" alt="Confusion Matrix">
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
+

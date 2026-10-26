@@ -20,3 +20,4 @@ detection:
 falsepositives:
   - Tests
 level: medium
+

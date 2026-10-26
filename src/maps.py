@@ -1,8 +1,11 @@
 import io
+from pathlib import Path
 
 from PIL import Image
 from folium import Map, Marker
 from requests import get
+
+PLOTS_DIR = Path(__file__).resolve().parent.parent / "plots"
 
 
 def get_from_api(addr):
@@ -30,7 +33,9 @@ def create_map(ips):
             'country': country,
         }
         Marker(location=[lat, lon]).add_to(m)
+    PLOTS_DIR.mkdir(parents=True, exist_ok=True)
     img_data = m._to_png(5)
     img = Image.open(io.BytesIO(img_data))
-    img.save('../plots/map.png')
+    img.save(PLOTS_DIR / 'map.png')
     return j
+
