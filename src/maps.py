@@ -19,7 +19,7 @@ def get_from_api(addr):
 
 
 def create_map(ips):
-    m = Map(location=[0, 0], zoom_start=2)
+    m = Map(location=[0, 0], zoom_start=2, tiles="Esri.WorldStreetMap")
     j = {}
     for ip in ips:
         result = get_from_api(ip)
