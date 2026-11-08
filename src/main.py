@@ -21,6 +21,7 @@ from src.report import generate_live_report, generate_pcap_analysis_report
 from src.rules import get_all_rules, high_packets, large_data, load_rules, port_80
 
 REPORTS_DIR = PROJECT_ROOT / "reports"
+PCAP_PATH_TYPE = click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, path_type=str)
 
 protocols = {
     1: 'ICMP',
@@ -29,6 +30,10 @@ protocols = {
     17: 'UDP',
     58: 'ICMPv6'
 }
+
+
+def prompt_pcap_path(prompt_text):
+    return click.prompt(prompt_text, type=PCAP_PATH_TYPE)
 
 
 def save_raw_report(result, output_path=REPORTS_DIR / "raw.json"):
@@ -122,13 +127,18 @@ def evaluate_live_stream(streamer, rules, model=None):
 
 
 def analyze_pcap(rules):
-    file_name = click.prompt("Enter the path of pcap file", type=str)
+    file_name = prompt_pcap_path("Enter the path of pcap file")
     use_ml = click.confirm("ML analysis?")
     model = read_model() if use_ml else None
     click.echo(f"Analysing file: {file_name}, ML analysis: {'Yes' if use_ml else 'No'}")
 
-    streamer = NFStreamer(source=file_name)
-    result = evaluate_pcap_stream(streamer, rules, model=model)
+    try:
+        streamer = NFStreamer(source=file_name)
+        result = evaluate_pcap_stream(streamer, rules, model=model)
+    except Exception as exc:
+        click.echo(f"Error while reading pcap file: {exc}")
+        return
+
     save_raw_report(result)
     generate_pcap_analysis_report(result)
 
@@ -151,24 +161,33 @@ def listen_on_interface(rules):
 
 
 def create_new_model():
-    malicious_pcap = click.prompt("Enter the path of pcap file with malicious training data")
-    normal_pcap = click.prompt("Enter the path of pcap file with normal training data")
+    malicious_pcap = prompt_pcap_path("Enter the path of pcap file with malicious training data")
+    normal_pcap = prompt_pcap_path("Enter the path of pcap file with normal training data")
     click.echo(f"Creating new model using files: {malicious_pcap}, {normal_pcap}")
-    create_and_train_model(malicious_pcap, normal_pcap)
+    try:
+        create_and_train_model(malicious_pcap, normal_pcap)
+    except Exception as exc:
+        click.echo(f"Error while creating model: {exc}")
 
 
 def train_current_model():
-    malicious_pcap = click.prompt("Enter the path of pcap file with malicious training data")
-    normal_pcap = click.prompt("Enter the path of pcap file with normal training data")
+    malicious_pcap = prompt_pcap_path("Enter the path of pcap file with malicious training data")
+    normal_pcap = prompt_pcap_path("Enter the path of pcap file with normal training data")
     click.echo(f"Training model using files: {malicious_pcap}, {normal_pcap}")
-    train_model(malicious_pcap, normal_pcap)
+    try:
+        train_model(malicious_pcap, normal_pcap)
+    except Exception as exc:
+        click.echo(f"Error while training model: {exc}")
 
 
 def test_current_model():
-    malicious_pcap = click.prompt("Enter the path of pcap file with malicious testing data")
-    normal_pcap = click.prompt("Enter the path of pcap file with normal testing data")
+    malicious_pcap = prompt_pcap_path("Enter the path of pcap file with malicious testing data")
+    normal_pcap = prompt_pcap_path("Enter the path of pcap file with normal testing data")
     click.echo(f"Testing model using files: {malicious_pcap}, {normal_pcap}")
-    print(test_model(malicious_pcap, normal_pcap))
+    try:
+        print(test_model(malicious_pcap, normal_pcap))
+    except Exception as exc:
+        click.echo(f"Error while testing model: {exc}")
 
 
 def display_menu():
