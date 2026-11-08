@@ -162,9 +162,9 @@
         {% endif %}
 
         <h2>Geolocation Map:</h2>
-        {% if map_image %}
+        {% if map_html %}
         <div class="chart">
-            <img src="{{ map_image }}" alt="IP Geolocation Map">
+            {{ map_html | safe }}
         </div>
         {% endif %}
         {% if map_locations %}

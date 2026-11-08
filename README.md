@@ -93,7 +93,7 @@ Choose one of the options:
   * [`src/rules/`](src/rules) – Sigma-style YAML rule definitions (e.g., [`rule.yaml`](src/rules/rule.yaml))
   * [`src/machine_learning_model.py`](src/machine_learning_model.py) – `SGDClassifier` training, incremental learning, and evaluation
   * [`src/graphs.py`](src/graphs.py) – Matplotlib chart generation (`flow_analysis.png`, `rule_analysis.png`, `ml_analysis.png`, `confusion_matrix.png`, `feature_importance.png`)
-  * [`src/maps.py`](src/maps.py) – IP geolocation lookup (`ip-api.com`) and Folium map rendering (`map.png`)
+  * [`src/maps.py`](src/maps.py) – IP geolocation lookup (`ip-api.com`) and interactive Folium HTML map generation
   * [`src/report.py`](src/report.py) – Jinja2 HTML report rendering with base64-embedded plots
   * [`src/templates/`](src/templates) – Jinja2 HTML templates for PCAP, live, and model evaluation reports
 * `pcap/` – sample packet captures (`malicious.pcap`, `normal.pcap`)

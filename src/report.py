@@ -75,7 +75,7 @@ def generate_pcap_analysis_report(result, report_file="reports/pcap_analysis_rep
     top_flows = result['flow_analysis'][:5]
     ips = {flow['source_ip'] for flow in result['flow_analysis']}
     ips |= {flow['destination_ip'] for flow in result['flow_analysis']}
-    map_locations = create_map(ips)
+    map_locations, map_html = create_map(ips)
 
     has_ml = 'ml_analysis' in result
     context = {
@@ -88,7 +88,7 @@ def generate_pcap_analysis_report(result, report_file="reports/pcap_analysis_rep
         "flow_plot": encode_image_base64(PLOTS_DIR / "flow_analysis.png"),
         "rule_plot": encode_image_base64(PLOTS_DIR / "rule_analysis.png"),
         "ml_plot": encode_image_base64(PLOTS_DIR / "ml_analysis.png") if has_ml else None,
-        "map_image": encode_image_base64(PLOTS_DIR / "map.png"),
+        "map_html": map_html,
         "map_locations": map_locations,
         "map_locations_json": json.dumps(map_locations, indent=4),
     }
